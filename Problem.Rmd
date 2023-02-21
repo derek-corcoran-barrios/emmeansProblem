@@ -1,25 +1,22 @@
 ---
-output: github_document
+output:
+  reprex::reprex_document:
+    venue: "gh"
+    advertise: FALSE
+    session_info: TRUE
+    style: TRUE
+    comment: "#;-)"
+    tidyverse_quiet: TRUE
+    std_out_err: TRUE
+knit: reprex::reprex_render
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  warning = F,
-  error = F,
-  message = F
-)
-```
-
-# emmeansProblem
+# emmeans cant evaluate averaging object
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of emmeansProblem is to generate a reproducible example to solve the issues within our model averaging within the emmeans package
+The problem is that emmeans gives an error when evaluating an averaging object form the MuMIn package, even when it says it should in this [link](https://cran.r-project.org/web/packages/emmeans/vignettes/models.html) I have been trying to debug this for a couple of days with no luck. All data and code is in [this repo](https://github.com/derek-corcoran-barrios/emmeansProblem)
 
 first we load the needed r packages and the dataset
 
@@ -50,7 +47,7 @@ Model <- glmer(richness ~ aspect + elevation +
 
 And we make a model selection (skip this step since it takes a while, the "SelectRichness.rds" file is in [this](https://github.com/derek-corcoran-barrios/emmeansProblem) github)
 
-```{r, cache = T}
+```{r, cache = T, message=F, error=F}
 options(na.action = "na.fail")
 
 library(doParallel)
@@ -95,7 +92,7 @@ pairs(noise.emm, simple = "treatment") |>
 
 This does not work 
 
-```{r, eval=FALSE}
+```{r}
 AV <- model.avg(SelectedList, fit = TRUE)
 
 noise.emm_av <- emmeans(AV, pairwise ~ year  + initial_habitat +  initial_habitat:year + year:treatment, at = list(year = 4), data = Data)
@@ -106,11 +103,3 @@ pairs(noise.emm_av, simple = "treatment") |>
   dplyr::select(-SE, -df, -z.ratio) |> 
   knitr::kable()
 ```
-
-Giving the following error
-
-```{r, eval=FALSE}
-Error in (mth$objs[[1]])(object, trms, xlev, grid, ...) : 
-  Unable to match model terms
-```
-
